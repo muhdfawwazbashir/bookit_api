@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.core.database import Base
 from datetime import datetime
 from app.models.booking import Booking
@@ -15,5 +16,13 @@ class Review(Base):
     comment = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    booking = relationship("Booking", back_populates="reviews")
-    user = relationship("User", secondary="bookings", back_populates="reviews", overlaps="bookings,reviews")
+    booking = relationship("Booking", back_populates="reviews", foreign_keys=[booking_id])
+    # user = relationship("User", secondary="bookings", back_populates="reviews", overlaps="bookings,reviews")
+
+    @hybrid_property
+    def user_id(self):
+        return self.booking.user_id   # ✅ comes from Booking
+
+    @hybrid_property
+    def service_id(self):
+        return self.booking.service_id 

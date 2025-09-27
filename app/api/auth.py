@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate, UserOut
+from app.schemas.user import UserCreate, UserOut, TokenResponse, LoginRequest
 from app.services import auth as auth_service 
 from app.services import user as user_service
 from app.core.database import get_db
 
 
-router = APIRouter(tags=["auth"])
+
+router = APIRouter(tags=["Auth"])
 
 @router.post("/register", response_model=UserOut, status_code=201)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
@@ -19,16 +20,17 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
     
-@router.post("/login")
-def login(form_data:dict, db: Session = Depends(get_db)):
-    email = form_data.get("email")
-    password = form_data.get("password")
-    if not email or not password:
-        raise HTTPException(status_code=400, detail="Email and password required.")
-    token, user = auth_service.login_user(db, email, password)
+@router.post("/login", response_model=TokenResponse)
+def login(login_data:LoginRequest, db: Session = Depends(get_db)):
+    user_email = login_data.email
+    password = login_data.password
+        
+    token, user = auth_service.login_user(db, user_email, password)
+
     if not token:
         raise HTTPException(status_code=401, detail="Invalid Credentials.")
-    return {"access_token": token, "token_type": "bearer", "user": user}
+    
+    return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/refresh")
 def refresh():
@@ -36,7 +38,7 @@ def refresh():
 
 @router.post("/logout")
 def logout():
-    return {"message": "Logout logic will go here."}
+    return {"message": "Logout from Swagger Authorize."}
 
 
 

@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Boolean, DateTime, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.associationproxy import association_proxy
 from app.core.database import Base
 from app.schemas.user import RoleEnum
 from app.models.booking import Booking
@@ -21,4 +22,5 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
 
     bookings = relationship("Booking", back_populates="user", cascade=["all", "delete-orphan"])
-    reviews = relationship("Review", secondary="bookings", back_populates="user", overlaps="reviews,bookings")
+    reviews = association_proxy("bookings", "reviews")
+    # reviews = relationship("Review", secondary="bookings", back_populates="user", overlaps="reviews,bookings")

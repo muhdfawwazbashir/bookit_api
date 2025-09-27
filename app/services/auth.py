@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from app.repositories import user as user_repo
 from app.schemas.user import UserCreate
 from app.core import security
@@ -12,7 +13,7 @@ def authenticate_user(db: Session, email: str, password: str):
 def login_user(db: Session, email: str, password: str):
     user = authenticate_user(db, email, password)
     if not user:
-        return None
+        raise HTTPException(status_code=401, detail="Incorrect email or password", headers={"WWW-Authenticate": "Bearer"})
     token_data = {"sub": str(user.id)}
     access_token = security.create_access_token(token_data)
     return access_token, user

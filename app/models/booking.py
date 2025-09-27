@@ -28,4 +28,4 @@ class Booking(Base):
 
     user = relationship('User', back_populates='bookings')
     service = relationship('Service', back_populates='bookings')
-    reviews = relationship("Review", back_populates="booking", uselist=False, cascade=["all", "delete-orphan"])
+    reviews = relationship("Review", back_populates="booking", uselist=False, foreign_keys="Review.booking_id",  cascade=["all", "delete-orphan"])

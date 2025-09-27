@@ -4,7 +4,7 @@ from typing import Optional
 from enum import Enum
 import uuid
 
-class RoleEnum(Enum):
+class RoleEnum(str, Enum):
     user = "user"
     admin = "admin"
 
@@ -29,6 +29,14 @@ class UserOut(UserBase):
     class Config:
         from_attributes = True
 
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 
 

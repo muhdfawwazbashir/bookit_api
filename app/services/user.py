@@ -1,16 +1,19 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.repositories import user as user_repo
 from app.schemas.user import UserCreate, UserUpdate
-from app.core import security, database
+from app.models.user import User
+from app.core import database
+from app.core.security import decode_access_token
+
 import uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+security = HTTPBearer()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 def get_password_hash(password: str):
     return pwd_context.hash(password)
@@ -41,8 +44,12 @@ def update_user(db: Session, user_id: uuid.UUID, user_update: UserUpdate):
         password_hash = get_password_hash(user_update.password)
     return user_repo.update_user(db, user_id, user_update, password_hash)
 
-def get_current_user(db: Session = Depends(database.get_db), token: str = Depends(oauth2_scheme)):
-    payload = security.decode_access_token(token)
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(database.get_db),
+):
+    token = credentials.credentials
+    payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid token.")
     user_id = payload.get("sub")
@@ -50,3 +57,8 @@ def get_current_user(db: Session = Depends(database.get_db), token: str = Depend
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+def require_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    return current_user
