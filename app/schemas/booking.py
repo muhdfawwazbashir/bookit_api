@@ -15,7 +15,7 @@ class BookingStatus(str, Enum):
 class BookingBase(BaseModel):
     service_id: uuid.UUID = Field(
         ...,
-        example="00000000-0000-0000-0000-000000000001"
+        example="00000000-0000-0000-0000-000000000000"
     )
     start_time: datetime
     end_time: datetime

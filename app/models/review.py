@@ -17,7 +17,7 @@ class Review(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     booking = relationship("Booking", back_populates="reviews", foreign_keys=[booking_id])
-    # user = relationship("User", secondary="bookings", back_populates="reviews", overlaps="bookings,reviews")
+    
 
     @hybrid_property
     def user_id(self):

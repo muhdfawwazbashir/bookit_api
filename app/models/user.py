@@ -23,4 +23,3 @@ class User(Base):
 
     bookings = relationship("Booking", back_populates="user", cascade=["all", "delete-orphan"])
     reviews = association_proxy("bookings", "reviews")
-    # reviews = relationship("Review", secondary="bookings", back_populates="user", overlaps="reviews,bookings")
