@@ -117,3 +117,13 @@ Once running, visit:
 - CORS middleware configured
 - Input validation with Pydantic
 - SQL injection protection with SQLAlchemy ORM
+
+Created admin for testing.
+{
+  "name": "Muhammad Fawwaz Bashir",
+  "email": "mohhbashir@gmail.com",
+  "password": "12345678"
+  "role": "admin",
+  "id": "ecd7e71c-6f30-411c-8fe9-d332a5486eb2",
+  "created_at": "2025-10-03T15:41:01.248425"
+}
