@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from fastapi.security import HTTPBearer
 from app.api import auth, users, services, bookings, reviews
+from app.core.database import Base, engine
+
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
